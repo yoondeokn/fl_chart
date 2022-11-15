@@ -360,12 +360,22 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
       getPixelY(showOnRodData.toY, viewSize, holder),
     );
 
+    /// Real Value Offset (backDrawRod)
+    final realBarOffset = Offset(
+      groupPositions[barGroupIndex].barsX[barRodIndex],
+      getPixelY(showOnBarGroup.barRods[barRodIndex].backDrawRodData.toY, viewSize, holder),
+    );
+
     final tooltipWidth = textWidth + tooltipData.tooltipPadding.horizontal;
     final tooltipHeight = textHeight + tooltipData.tooltipPadding.vertical;
 
     final zeroY = getPixelY(0, viewSize, holder);
     final barTopY = min(zeroY, barOffset.dy);
     final barBottomY = max(zeroY, barOffset.dy);
+
+    /// Real Value Top (backDrawRod)
+    final realBarTopY = min(zeroY, realBarOffset.dy);
+
     final drawTooltipOnTop = tooltipData.direction == TooltipDirection.top ||
         (tooltipData.direction == TooltipDirection.auto &&
             showOnRodData.isUpward());
@@ -466,7 +476,14 @@ class BarChartPainter extends AxisChartPainter<BarChartData> {
         canvasWrapper
           ..drawRRect(roundedRect, _bgTouchTooltipPaint)
           ..drawRRect(roundedRect, _borderTouchTooltipPaint)
-          ..drawText(tp, drawOffset);
+          ..drawText(tp, drawOffset)
+            /// Draw Lines
+          ..drawLine(
+            Offset((rect.left + rect.right) / 2, rect.bottom),
+            Offset((rect.left + rect.right) / 2, realBarTopY),
+            Paint()
+              ..color = tooltipData.tooltipBgColor
+              ..strokeWidth = 1);
       },
     );
   }
